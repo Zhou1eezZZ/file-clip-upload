@@ -1,7 +1,5 @@
 import Axios from 'axios'
 import Config from '../config'
-import { getToken } from '../utils/auth'
-// import { isArray, isObject } from '../utils/types'
 
 const { devUrl, proUrl, timeout } = Config.server
 
@@ -13,9 +11,6 @@ Axios.defaults.headers = {
 
 Axios.interceptors.request.use(
     config => {
-        const token = getToken()
-        token && (config.headers['Authorization'] = token)
-
         return config
     },
     error => {
@@ -32,18 +27,6 @@ Axios.interceptors.response.use(
     }
 )
 
-// const transformRequest = data => {
-//     const transformData = {}
-
-//     Object.keys(data).forEach(key => {
-//         const dataItem = data[key]
-//         transformData[key] =
-//             isArray(dataItem) || isObject(dataItem) ? JSON.stringify(dataItem) : dataItem
-//     })
-
-//     return transformData
-// }
-
 export default ({ method, url, params, data, config }) => {
     return new Promise((resolve, reject) => {
         Axios({
@@ -51,7 +34,6 @@ export default ({ method, url, params, data, config }) => {
             url,
             params: params ? params : {},
             data: data ? data : {},
-            // transformRequest,
             ...config
         })
             .then(response => {

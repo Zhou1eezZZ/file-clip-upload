@@ -1,50 +1,58 @@
 <template>
     <div id="app">
         <div class="container">
-            <h1>file-clip</h1>
-            <el-upload ref="upload" action="#" :before-upload="beforeUpload">
-                <el-button
-                    slot="trigger"
-                    size="small"
-                    type="primary"
-                    :disabled="file && !hash ? true : false"
-                    >选择文件</el-button
-                >
-                <el-button
-                    v-if="file"
-                    style="margin-left:20px"
-                    size="small"
-                    type="success"
-                    @click="submitUpload"
-                    :disabled="hash ? false : true"
-                    >上传</el-button
-                >
-                <el-button
-                    v-if="file && hash"
-                    style="margin-left:20px"
-                    size="small"
-                    type="danger"
-                    @click="resetFile"
-                    >重置</el-button
-                >
-            </el-upload>
-            <div v-if="file" class="file-tip">
-                <p>文件名:{{ file.name }}</p>
-                <p>文件大小:{{ (file.size / 1024).toFixed(2) }} kb</p>
-                <p>文件hash:{{ hash ? hash : '生成文件hash中...' }}</p>
-                <el-progress
-                    style="margin-top:20px"
-                    :text-inside="true"
-                    :stroke-width="26"
-                    :percentage="percentage"
-                ></el-progress>
-            </div>
+            <h1 class="logo">FileClip.</h1>
+            <transition name="fade">
+                <div v-show="isEnter">
+                    <el-upload ref="upload" action="#" :before-upload="beforeUpload">
+                        <el-button
+                            v-show="!file"
+                            slot="trigger"
+                            size="small"
+                            type="primary"
+                            :disabled="file && !hash ? true : false"
+                            >Choose File</el-button
+                        >
+                        <el-button
+                            v-if="file"
+                            size="small"
+                            type="success"
+                            @click="submitUpload"
+                            :disabled="hash ? false : true"
+                            >Upload</el-button
+                        >
+                        <el-button
+                            v-if="file"
+                            style="margin-left:20px"
+                            size="small"
+                            type="danger"
+                            @click="resetFile"
+                            :disabled="hash ? false : true"
+                            >Reset</el-button
+                        >
+                    </el-upload>
+                    <transition name="fade">
+                        <div v-if="file" class="file-tip">
+                            <p>FileName:{{ file.name }}</p>
+                            <p>FileSize:{{ fileSize }}</p>
+                            <p>FileHash:{{ hash ? hash : 'Generating file hash...' }}</p>
+                            <el-progress
+                                style="margin-top:20px"
+                                :text-inside="true"
+                                :stroke-width="26"
+                                :percentage="percentage"
+                            ></el-progress>
+                        </div>
+                    </transition>
+                </div>
+            </transition>
         </div>
     </div>
 </template>
 
 <script>
 import { uploadFile, mergeFile, verifyFile } from './api/upload'
+import { calculateFileSize } from './utils/tool'
 
 const CLIP_SIZE = 1024 * 1024 * 2 // 最小切片的大小
 
@@ -57,7 +65,8 @@ export default {
             clipPercentage: {},
             hashPercentage: 0, // 界面中并未可视化展示
             fileChunkList: [],
-            secondlyUpload: false
+            secondlyUpload: false,
+            isEnter: false
         }
     },
     watch: {
@@ -84,7 +93,15 @@ export default {
                 return percentage > 100 ? 100 : percentage
             }
             return 0
+        },
+        fileSize() {
+            return calculateFileSize(this.file.size)
         }
+    },
+    mounted() {
+        setTimeout(() => {
+            this.isEnter = true
+        }, 1500)
     },
     methods: {
         // 重置按钮
@@ -122,11 +139,11 @@ export default {
                     this.uploadFileList(this.fileChunkList)
                 } else {
                     this.secondlyUpload = true
-                    this.$message.success('文件秒传成功！')
+                    this.$message.success('Ohh, Upload secondly!')
                 }
             } catch (error) {
                 console.log(error)
-                this.$message.error('文件上传失败')
+                this.$message.error('Upload failed.')
             }
         },
         async uploadFileList(fileList) {
@@ -150,14 +167,14 @@ export default {
                 // 合并切片
                 this.mergeRequest(this.file.name, this.hash)
             } catch (error) {
-                this.$message.error('上传出错')
+                this.$message.error('Upload error.')
                 console.log(error)
             }
         },
         async mergeRequest(fileName, hash) {
             try {
                 await mergeFile(fileName, hash)
-                this.$message.success('文件上传成功')
+                this.$message.success('Upload success.')
             } catch (error) {
                 console.log(error)
             }
@@ -184,17 +201,38 @@ export default {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    // text-align: center;
+    text-align: center;
     color: #2c3e50;
     .container {
-        padding: 0 30px;
-        h1 {
+        font-family: 'Google-Sans';
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        .logo {
             font-size: 30px;
             line-height: 50px;
+            margin-bottom: 20px;
+            transition: all 1s;
         }
         .file-tip {
             margin-top: 20px;
+            line-height: 1.4em;
         }
     }
+}
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+.fade-leave,
+.fade-enter-to {
+    opacity: 1;
+}
+.fade-enter-active,
+.fade-leave-active {
+    transition: all 1s;
 }
 </style>
