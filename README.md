@@ -2,6 +2,9 @@
 
 > 本项目是对 [yeyan1996](https://juejin.im/user/5ba9f38ce51d450e8477bd7a) 在掘金 [实现一个大文件上传和断点续传](https://juejin.im/post/5dff8a26e51d4558105420ed#heading-19) 一文中技术项目的一个修改版本。支持根据文件大小来进行切片上传以及文件的秒传。可以通过项目中的 `CLIP_SIZE` 变量自定义单个切片的大小，程序会根据该值对文件进行切片并上传。
 
+## 项目运行图片
+![项目图片](https://github.com/Zhou1eezZZ/Image/blob/master/fileclip.gif)
+
 ## TODO
 
 - [ ] 断点续传
@@ -34,16 +37,13 @@
 |   |   |-- axios.js // 请求封装
 |   |   |-- upload.js // 上传用到的各个接口
 |   |-- assets
-|   |-- components
+|       |-- fonts // 本地字体存储
 |   |-- config
 |   |   |-- index.js
 |   |-- styles
 |   |   |-- reset.css
 |   |-- utils
-|       |-- auth.js
-|       |-- dom.js
-|       |-- project.js
-|       |-- types.js
+|       |-- tool.js // 工具函数
 |-- target // 上传的文件的保存目录
     |-- 9db49411dd83dec76bec773dce65e5f4.gif // 上传的文件，名字为（hash值+后缀）
 ```
