@@ -55,9 +55,14 @@
 npm install
 ```
 
-### 启动项目开发环境
+### 启动项目前端开发环境
 ```
 npm run serve
+```
+
+### 启动项目后端服务
+```
+nodemon ./server/app.js
 ```
 
 ### 打包项目
